@@ -1,0 +1,26 @@
+---
+- name: Deploy Laravel App to Server
+  hosts: all
+  tasks:
+    - name: Ensure deployment directory exists
+      ansible.builtin.file:
+        path: "/var/www/html/Sothiphak" 
+        state: directory
+        mode: '0755'
+
+    - name: Copy Laravel files to the server
+      ansible.posix.synchronize:
+        src: "{{ workspace }}/"
+        dest: "/var/www/html/Sothiphak/"
+        delete: yes
+        rsync_opts:
+          - "--exclude=.git"
+
+    - name: Set permissions for storage and bootstrap/cache
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0777'
+      loop:
+        - "/var/www/html/Sothiphak/storage"
+        - "/var/www/html/Sothiphak/bootstrap/cache"
