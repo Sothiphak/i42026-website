@@ -1,4 +1,3 @@
----
 - name: Deploy Laravel App to Server
   hosts: all
   tasks:
@@ -15,14 +14,22 @@
         delete: yes
         rsync_opts:
           - "--exclude=.git"
-          - "--exclude=database/database.sqlite"  # <-- ADD THIS
+          - "--exclude=database/database.sqlite"
           - "--exclude=.env"
 
-    - name: Set permissions for storage and bootstrap/cache
+    - name: Fix ownership for the entire project
+      ansible.builtin.file:
+        path: "/var/www/html/Sothiphak"
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Set secure permissions for storage and cache
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        mode: '0777'
+        mode: '0775'
+        recurse: yes
       loop:
         - "/var/www/html/Sothiphak/storage"
         - "/var/www/html/Sothiphak/bootstrap/cache"
